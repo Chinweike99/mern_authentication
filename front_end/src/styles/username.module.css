@@ -9,6 +9,9 @@
 .profile_img{
     @apply border-4 border-gray-100 w-[135px] rounded-full shadow-lg cursor-pointer;
     @apply hover:border-gray-300;
+    border-radius: 50%;
+    width: 8rem;
+    height: 8rem;
 }
 
 .textbox{
@@ -22,4 +25,8 @@
 
 .btn:hover{
     background-color: #ff6a6a;
+}
+
+input[type='file']{
+    display: none;
 }

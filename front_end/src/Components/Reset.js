@@ -1,18 +1,18 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import styles from '../styles/username.module.css'
 import { useFormik } from 'formik'
 import { Toaster } from 'react-hot-toast'
-import { validatePassword } from '../helper/validate'
+import { resetPassword } from '../helper/validate'
 
 const Reset = () => {
 
   const formik = useFormik({
     initialValues: {
-      password: "",
-      confirm_password: ""
+      password: "Chinweike12@",
+      confirm_password: "Chinweike12@"
     },
-    validate: validatePassword,
+    validate: resetPassword,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values =>{
@@ -26,7 +26,7 @@ const Reset = () => {
       <Toaster position='top-center' reverseOrder="false"></Toaster>
 
       <div className='flex justify-center pt-[10rem]  h-screen'>
-        <div className={styles.glass}>
+        <div className={styles.glass} style={{width: "50%"}}>
           <div className='title flex flex-col items-center'>
             <h4 className='text-5xl font-bold '>Reset Auth</h4>
             <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
