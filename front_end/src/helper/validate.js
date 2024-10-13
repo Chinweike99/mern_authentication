@@ -36,7 +36,7 @@ const passwordVerify = (error={}, values) => {
     }else if(values.password.includes(" ")){
         error.password = toast.error("Pssword should not be blank")
     }else if(values.password.length < 5){
-        error.password = toast.error("Password must be greater than 5")
+        error.password = toast.error("Password must be greater than 5 characters long")
     }else if(!specialChars.test(values.password)){
         error.password = toast.error("Add a special character (e.g @#$ etc)")
     }

@@ -10,7 +10,7 @@ const Password = () => {
 
   const formik = useFormik({
     initialValues: {
-      password: ""
+      password: "Chinwe123@"
     },
     validate: validatePassword,
     validateOnBlur: false,
@@ -41,7 +41,7 @@ const Password = () => {
 
             <div className='textbox flex flex-col items-center gap-3'>
               <input {...formik.getFieldProps('password')} className={styles.textbox} type='password' placeholder='Password'/>
-              <button className={styles.btn} type='submit'>Let's go</button>
+              <button className={styles.btn} type='submit'>Sign in</button>
             </div>
 
             <div className='text-center py-4'>
