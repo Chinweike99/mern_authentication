@@ -4,7 +4,7 @@ import { assets } from '../assets/assets'
 import styles from '../styles/username.module.css'
 import { useFormik } from 'formik'
 import { Toaster } from 'react-hot-toast'
-import { validatePassword } from '../helper/validate'
+import {validateRegister } from '../helper/validate'
 import { ConvertToBase64 } from '../helper/convert'
 
 const Register = () => {
@@ -17,7 +17,7 @@ const Register = () => {
       password: "",
       confirm_password: ""
     },
-    validate: validatePassword,
+    validate: validateRegister,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values =>{
@@ -56,8 +56,8 @@ const Register = () => {
             </div>
 
             <div className='textbox flex flex-col items-center gap-3'>
-              <input {...formik.getFieldProps('username')} className={styles.textbox} type='text' placeholder='username'/>
-              <input {...formik.getFieldProps('email')} className={styles.textbox} type='email' placeholder='email'/>
+              <input  {...formik.getFieldProps('username')} className={styles.textbox} type='text' placeholder='username'/>
+              <input  {...formik.getFieldProps('email')} className={styles.textbox} type='email' placeholder='email'/>
               <input {...formik.getFieldProps('password')} className={styles.textbox} type='password' placeholder='password'/>
               <input {...formik.getFieldProps('confirm_password')} className={styles.textbox} type='password' placeholder='confirm_password'/>
               <button className={styles.btn} type='submit'>Register</button>
