@@ -1,9 +1,7 @@
 // import { error } from "console";
-import { error } from "console";
 import UserModel from "../models/User.model.js"
 import bcryptjs from 'bcryptjs'
-// import { rmSync } from "fs";
-
+import jwt from 'jsonwebtoken'
 
 /**POST: http://localhost:3200/api/register
  * @param : {
@@ -82,8 +80,18 @@ export const login= async(req, res) => {
             return res.status(400).send({error: "Invalid Password"})
         }
 
+        //Create token
+        const token = jwt.sign({
+            userId: userExists._id,
+            username: userExists.username
+        }, 'secret', {expiresIn: "24h"})
+
         //If password is correct, send a success message
-        return res.status(200).send({msg: "Login was successful"})
+        return res.status(200).send({
+            msg: "Login was successful",
+            username: userExists.username,
+            token
+        })
 
     } catch (error) {
         return res.status(404).send(error.message)
