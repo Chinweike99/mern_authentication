@@ -20,7 +20,7 @@ router.route('/registerMail').post(); // Send mail
 router.route('/authenticate').post((req, res)=>{
     res.end();
 }); // Authenticate user
-router.route('/login').post(controller.login); // Login user
+router.route('/login').post(controller.verifyusers, controller.login); // Login user
 
 
 

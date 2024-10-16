@@ -2,6 +2,28 @@
 import UserModel from "../models/User.model.js"
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv';
+import { error } from "console";
+dotenv.config();
+
+
+/**Middle to Verify Users existence*/
+export const verifyusers = async(req, res, next)=>{
+    try {
+        const {username} = req.method == "GET" ? req.query : req.body;
+
+        // Check users existence
+        let usernameExits = await UserModel.findOne({username});
+        if(!usernameExits){
+            return res.status(404).send({error: "Can't find user"})
+        }
+        // If the user is found,
+        next();
+    } catch ({error}) {
+        return res.status(404).send({error: "Authentication error"})
+    }
+}
+
 
 /**POST: http://localhost:3200/api/register
  * @param : {
@@ -17,7 +39,7 @@ import jwt from 'jsonwebtoken'
  */
 
 export const register = async (req, res) => {
-    try {
+    try { 
         const {username, password, profile, email } = req.body;
         // Check if user Exists
         const existUsername = await UserModel.findOne({ username });
@@ -84,7 +106,7 @@ export const login= async(req, res) => {
         const token = jwt.sign({
             userId: userExists._id,
             username: userExists.username
-        }, 'secret', {expiresIn: "24h"})
+        }, process.env.JWT_SECRET, {expiresIn: "24h"})
 
         //If password is correct, send a success message
         return res.status(200).send({
@@ -101,8 +123,27 @@ export const login= async(req, res) => {
 /** GET: http://localhost:3200/api/user/example123
  */
 export const getUser = async(req, res) => {
-    res.json("Get user Route")
+    const {username} = req.params;
+    try {
+        if(!username){
+            return res.status(400).send({error: "User does not exist"})
+        }
+        const user = await UserModel.findOne({ username }); // Find user in the database
+        if(!user){
+            return res.status(404).send({error: "Could not find user"})
+        }
+
+        // Removing password from return vlaues to client
+        //Object.assign() is used to create a shallow copy of the object.
+        // copying the properties from user.toJSON() into a new empty object ({}),
+        const {password, ...rest} = Object.assign({}, user.toJSON());
+        return res.status(200).send(rest);//If user is found, send user details
+
+    } catch (error) {
+        return res.status(500).send({error: error.message || "Cannot find the user"})
+    }
 }
+
 
 /** PUT: http://localhost:3200/api/updateuser
  * @param{
@@ -115,7 +156,24 @@ export const getUser = async(req, res) => {
  * }
  */
     export const updateUser = async(req, res) => {
-        res.json("Updateuser route")
+        try {
+            const id = req.query.id;
+            if(!id){
+                return res.status(400).send({error: "No user with this id"})
+            }
+            const body = req.body;
+            const response = await UserModel.updateOne({_id: id}, body);
+            if(response.nModified === 0){
+                // if no documents were modified, it means user wa not found and data remained the same
+                return res.status(404).send({error: "User not found or no changes made"})
+            }
+            // Fetch the updated user from the database
+            const updatedUser = await UserModel.findById(id)
+            return res.status(200).send({msg: "Record updated", data: updatedUser})
+
+        } catch (error) {
+            return res.status(401).send(error.message)
+        }
     }
 
 
