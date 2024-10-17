@@ -3,8 +3,10 @@ import UserModel from "../models/User.model.js"
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
-import { error } from "console";
+// import { error } from "console";
 dotenv.config();
+import otpGenerator from 'otp-generator'
+import { error } from "console";
 
 
 /**Middle to Verify Users existence*/
@@ -157,18 +159,19 @@ export const getUser = async(req, res) => {
  */
     export const updateUser = async(req, res) => {
         try {
-            const id = req.query.id;
-            if(!id){
+            /* const id = req.query.id;*/ //retrieves the user ID from the query parameters in the request URL. The ID is manually supplied as a parameter in the URL
+            const {userId} = req.user; // This approach enhances security by tying the update action to the logged-in user's identity, preventing users from attempting to update other users' data.
+            if(!userId){
                 return res.status(400).send({error: "No user with this id"})
             }
             const body = req.body;
-            const response = await UserModel.updateOne({_id: id}, body);
+            const response = await UserModel.updateOne({_id: userId}, body);
             if(response.nModified === 0){
                 // if no documents were modified, it means user wa not found and data remained the same
                 return res.status(404).send({error: "User not found or no changes made"})
             }
             // Fetch the updated user from the database
-            const updatedUser = await UserModel.findById(id)
+            const updatedUser = await UserModel.findById(userId)
             return res.status(200).send({msg: "Record updated", data: updatedUser})
 
         } catch (error) {
@@ -179,12 +182,21 @@ export const getUser = async(req, res) => {
 
 /**GET: http://localhost:3200/api/generateOTP */
 export const generateOTP = async(req, res) => {
-    res.json("generateOTP route")
+    //Define format of your otp
+    req.app.locals.OTP = await otpGenerator.generate(9, {lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false});
+    res.status(201).send({code: req.app.locals.OTP})
 }
 
 /**GET: http://localhost:3200/api/verifyOTP */
 export const verifyOTP = async(req, res) => {
-    res.json("verifyOTP route")
+    const { code } = req.query;
+    //checks if the OTP stored in the server's local memory (req.app.locals.OTP) matches the code provided by the user.
+    if(parseInt(req.app.locals.OTP) === parseInt(code)){
+        req.app.locals.OTP = null; // When the OTP matches, the server sets req.app.locals.OTP to null. This effectively clears the stored OTP, preventing it from being reused.
+        req.app.locals.resetSession = true; //Sets a resetSession flag in the server's local memory to true, indicating that the user has successfully verified the OTP.
+        return res.status(201).send({msg: "Verify successful!"});
+    }
+    return res.status(400).send({error: "Invalid OTP"}); // If the OTP does not match, this line sends a response with a 400 status code (indicating a bad request) and an error message "Invalid OTP"
 }
 
 
