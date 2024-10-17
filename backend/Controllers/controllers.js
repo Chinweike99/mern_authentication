@@ -203,7 +203,11 @@ export const verifyOTP = async(req, res) => {
 //Suucessfull redirect user when OTP is valid
 /**GET: http://localhost:3200/api/createResetSession */
 export const createResetSession = async(req, res) => {
-    res.json("createRestSession route")
+    if(req.app.locals.resetSession){
+        req.app.locals(resetSession) = false;
+        return res.status(201).send({message: "Access granted"})
+    }
+    return res.status(404).send({error: "Session expired"})
 }
 
 
@@ -211,7 +215,34 @@ export const createResetSession = async(req, res) => {
  * Update the password when there is a valid session
  */
 export const resetPasword = async(req, res) => {
-    res.json("resetPassword route")
+ try {
+    // Check if a user has a valid session, only then cam password be updated
+    if(!req.app.locals.resetSession){
+        return res.status(404).send({error: "Session expired"})
+    }
+
+    const { username, password } = req.body;
+    //Find the user by name
+    const user = await UserModel.findOne({username});
+    if(!user){
+        return res.status(404).send({error: "Username not found"})
+    }
+    const hashedPassword = await bcryptjs.hash(password, 15);//Hash the new password
+
+    // Update the users password
+    const response = await UserModel.updateOne(
+        { username: user.username },
+        { password: hashedPassword }
+    );
+
+    if(response.nModified === 0){
+        return res.status(400).send({error: "Password update failed"})
+    }
+    return res.status(201).send({msg: "Record Updated"})
+
+ } catch (error) {
+    return res.status(500).send({ error: error.messge || "An error occurred"})
+ }
 }
 
 

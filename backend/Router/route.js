@@ -6,6 +6,7 @@ const router = Router();
 /** Import all controllers */
 import * as controller from '../Controllers/controllers.js'
 import { Auth, localVariable } from "../Middlewares/auth.js";
+import { registerMail } from "../Controllers/mail.js";
 
 
 /**GET ROUTE */
@@ -17,7 +18,7 @@ router.route('/createResetSession').get(controller.createResetSession); // Creat
 
 /** POST ROUTE */
 router.route('/register').post(controller.register)//Register user
-router.route('/registerMail').post(); // Send mail
+router.route('/registerMail').post(registerMail); // Send mail
 router.route('/authenticate').post((req, res)=>{
     res.end();
 }); // Authenticate user
@@ -27,7 +28,7 @@ router.route('/login').post(controller.verifyusers, controller.login); // Login 
 
 /** PUT ROUTE */
 router.route('/updateuser').put(Auth , controller.updateUser); // update user profile
-router.route('/resetPasword').put(controller.resetPasword); // update user password
+router.route('/resetPassword').put(controller.verifyusers, controller.resetPasword); // update user password
 
 
 
