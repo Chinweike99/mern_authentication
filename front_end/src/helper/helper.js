@@ -2,6 +2,11 @@ import axios from 'axios'
 import { stat } from 'fs'
 
 
+/******** Specify Backend domain */
+axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
+
+
+
 /** Make API requests */
 export const authenticate = async(username) => {
     try {
@@ -88,9 +93,22 @@ export const generateOTP = async(username)=>{
 /************ Verify OTP */
 export const verifyOTP = async({username, code})=>{
     try {
+        // Making a GET request to the '/api/verifyOTP' endpoint with the username and code as query parameters
         const {data, status} = await axios.get('/api/verifyOTP', {params: {username, code}});
+        // Returning the response data and status code from the request
         return {data, status}
     } catch (error) {
         return Promise.reject(error)
+    }
+}
+
+
+/********** RESET PASSWORD  */
+export const resetPassword = async({username, password})=>{
+    try {
+        const {data, status} = await axios.get('/api/resetPassword', {username, password});
+        return Promise.resolve({data, status});
+    } catch (error) {
+        return Promise.reject({error})
     }
 }
