@@ -1,27 +1,35 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import styles from '../styles/username.module.css'
 import { useFormik } from 'formik'
 import { Toaster } from 'react-hot-toast'
 import { usernameValidate } from '../helper/validate'
 import { useAuthStore } from '../Store/store'
+import { navigate } from 'react-router-dom'
 
  const Username = () => {
-
-  useAuthStore(state=> console.log(state))
+  const navigate = useNavigate();
+  const setUserName = useAuthStore(state=> state.setUsername);
+  // const username = useAuthStore(state => state.auth.username)
 
   const formik = useFormik({
     initialValues: {
-      username: ""
+      username: "TheodoreMangroove"
     },
     validate: usernameValidate,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values =>{
+      setUserName(values.username)
       console.log(values)
+      navigate('/password')
     }
   })
+
+  // useEffect(()=>{
+  //   console.log(username)
+  // })
 
 
   return (
@@ -33,7 +41,7 @@ import { useAuthStore } from '../Store/store'
           <div className='title flex flex-col items-center'>
             <h4 className='text-5xl font-bold '>Innocent Akwolu CHinweike</h4>
             <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
-              Learn more on Mern Authentication
+              Learn more on Mern Authentication... Sign In
             </span>
           </div>
 

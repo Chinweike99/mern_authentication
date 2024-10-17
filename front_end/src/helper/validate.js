@@ -2,7 +2,7 @@
  * usernameVerify: Function to verify username
  * usernameValidate: Function to validate username
  */
-
+import { Authenticate } from "./helper"
 import toast from "react-hot-toast"
 
 const usernameVerify = (error ={}, values) => {
@@ -16,8 +16,17 @@ const usernameVerify = (error ={}, values) => {
     return error;
 }
 
+/** validate login page username */
 export const usernameValidate = async(values)=>{
     const errors = usernameVerify({}, values);
+
+    if(values.username){
+        const {status} = await Authenticate(values.username);
+        if(status !== 200){
+            errors.exist = toast.error("User does not exist");
+        }
+       toast.success(`Welcome \n ${values.username}`)
+    }
 
     return errors;
 }

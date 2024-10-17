@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-//Prefix your function with use
+//Prefix your function with use (react hooks starts with use)
 export const useAuthStore = create((set) => ({
     // Initializing the 'auth' object in the store with default values
     auth: {

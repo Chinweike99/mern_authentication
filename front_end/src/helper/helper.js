@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { stat } from 'fs'
 
 
 /******** Specify Backend domain */
@@ -8,7 +7,9 @@ axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
 
 
 /** Make API requests */
-export const authenticate = async(username) => {
+
+/** AUTHENTICATE USERS */
+export const Authenticate = async(username) => {
     try {
         return await axios.post('/api/authenticate', { username })
     } catch (error) {
