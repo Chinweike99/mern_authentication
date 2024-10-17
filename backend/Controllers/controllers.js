@@ -9,7 +9,7 @@ import otpGenerator from 'otp-generator'
 import { error } from "console";
 
 
-/**Middle to Verify Users existence*/
+/**Middleware to Verify Users existence*/
 export const verifyusers = async(req, res, next)=>{
     try {
         const {username} = req.method == "GET" ? req.query : req.body;
@@ -167,7 +167,7 @@ export const getUser = async(req, res) => {
             const body = req.body;
             const response = await UserModel.updateOne({_id: userId}, body);
             if(response.nModified === 0){
-                // if no documents were modified, it means user wa not found and data remained the same
+                // if no documents were modified, it means user was not found and data remained the same
                 return res.status(404).send({error: "User not found or no changes made"})
             }
             // Fetch the updated user from the database
