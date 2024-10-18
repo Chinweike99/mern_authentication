@@ -75,7 +75,6 @@ export const register = async (req, res) => {
             return res.status(400).send({error: "Password is required"})
         }
 
-
     } catch (error) {
         return res.status(500).send({error: error.message || "Internal Server Error"});
     }
@@ -168,7 +167,7 @@ export const getUser = async(req, res) => {
             const response = await UserModel.updateOne({_id: userId}, body);
             if(response.nModified === 0){
                 // if no documents were modified, it means user was not found and data remained the same
-                return res.status(404).send({error: "User not found or no changes made"})
+                return res.status(404).send({error: "User not found or no changes made"});
             }
             // Fetch the updated user from the database
             const updatedUser = await UserModel.findById(userId)
