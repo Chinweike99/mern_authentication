@@ -27,22 +27,43 @@ export const getUser = async({ username })=>{
     }
 }
 
-/** Register user */
-export const registerUser = async(credentials)=> {
-    try {
-        const {data: {msg}, status} = await axios.post(`/api/register`, credentials);
-        let { username, email } = credentials;
+/** Register user: This also works, but needs email verification, learn enail verification */
+// export const registerUser = async(credentials)=> {
+//     try {
+//         const {data: {msg}, status} = await axios.post(`/api/register`, credentials);
+//         let { username, email } = credentials;
         // If registration was successfull Send email ()
-        if(status === 201){
-            await axios.post('/api/registerMail', { username, userEmail: email, text: msg })
+//         if(status === 201){
+//             await axios.post('/api/registerMail', { username, userEmail: email, text: msg })
+//         }
+//     } catch (error) {
+//         return Promise.reject({ error })
+//     }
+// }
+
+export const registerUser = async (credentials) => {
+    try {
+        // Send registration request
+        const { data: { msg }, status } = await axios.post(`/api/register`, credentials);
+
+        // If registration was successful, automatically log the user in
+        if (status === 201) {
+            const { username, password } = credentials; // Assuming password is provided in the credentials
+            const loginResponse = await axios.post('/api/login', { username, password });
+
+            // Return login response for further processing (like storing tokens, etc.)
+            return loginResponse;
         }
     } catch (error) {
-        return Promise.reject({ error })
+        // Handle registration or login failure
+        return Promise.reject({ error });
     }
 }
 
+
+
 /** LOGIN USER */
-export const verifyUser = async({username, password}) =>{
+export const verifyPassword = async({username, password}) =>{
     try {
         if(username){
             const {data} = await axios.post('/api/login', {username, password});

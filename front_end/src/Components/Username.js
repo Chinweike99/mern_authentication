@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import styles from '../styles/username.module.css'
@@ -6,7 +6,6 @@ import { useFormik } from 'formik'
 import { Toaster } from 'react-hot-toast'
 import { usernameValidate } from '../helper/validate'
 import { useAuthStore } from '../Store/store'
-import { navigate } from 'react-router-dom'
 
  const Username = () => {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ import { navigate } from 'react-router-dom'
 
   const formik = useFormik({
     initialValues: {
-      username: "TheodoreMangroove"
+      username: ""
     },
     validate: usernameValidate,
     validateOnBlur: false,

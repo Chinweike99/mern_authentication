@@ -1,14 +1,17 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import styles from '../styles/username.module.css'
 import { useFormik } from 'formik'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import {validateRegister } from '../helper/validate'
 import { ConvertToBase64 } from '../helper/convert'
+import { registerUser } from '../helper/helper'
+
 
 const Register = () => {
   const [file, setFile] = useState();
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -22,6 +25,15 @@ const Register = () => {
     validateOnChange: false,
     onSubmit: async values =>{
       values = await Object.assign(values, {profile: file || ""})
+      let registerPromise =  registerUser(values);
+      toast.promise(registerPromise, {
+        loading: "Creating ....",
+        success: <b>Registeration successful ...</b>,
+        error: <b>Could not register user</b>
+      }).then(() => {
+        // Navigate to login route upon successful registration
+        navigate('/');
+      });
       console.log(values)
     }
   })

@@ -3,27 +3,45 @@ import { Link } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import styles from '../styles/username.module.css'
 import { useFormik } from 'formik'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import {validateProfile } from '../helper/validate'
 import { ConvertToBase64 } from '../helper/convert'
 import extend from '../styles/Profile.module.css'
+import { useFetch } from '../hooks/fetch.hooks'
+import { useAuthStore } from '../Store/store'
+import { updateUser } from '../helper/helper'
+
 
 const Profile = () => {
-  const [file, setFile] = useState();
 
+  /** backend apis */
+  const {username} = useAuthStore(state => state.auth)
+  const {isLoading, apiData, serverError} = useFetch(`/user/${username}`);
+
+
+  /**FRONT-END */
+  const [file, setFile] = useState();
   const formik = useFormik({
-    initialValues: {
-      firstName: "",
-      lastName: "",
-      mobile: "",
-      email: "",
-      address: ""
+    initialValues: { // while building the frontend only, initialvalues are set directly to empt strings
+      firstName: apiData?.firstName || "",
+      lastName: apiData?.lastName || "",
+      mobile: apiData?.mobile || "",
+      email: apiData?.email || "",
+      address: apiData?.address || ""
     },
+    enableReinitialize: true, //the form will reinitialize its values whenever the initialValues prop changes.
     validate: validateProfile,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values =>{
       values = await Object.assign(values, {profile: file || ""}) //Object.assign is javaSript way of adding properties to an object.
+      let updatePromise = updateUser(values);
+
+      toast.promise(updatePromise, {
+        loading: "Updating",
+        success: <b>Updated successfuly 🥳</b>,
+        error: <b>Update failed 😔</b>
+      })
       console.log(values)
     }
   })
@@ -34,6 +52,10 @@ const Profile = () => {
     setFile(base64)
   }
 
+  if(isLoading) return <h1 className='text-2xl font-bold'>isLoading ...</h1>
+  if(serverError) return <h1 className='text-xl text-red-500'>{serverError.message}</h1>
+
+
   return (
     <div className='container mx-auto'>
       <Toaster position='top-center' reverseOrder="false"></Toaster>
@@ -43,7 +65,7 @@ const Profile = () => {
           <div className='title flex flex-col items-center'>
             <h4 className='text-5xl font-bold '>Profile Auth</h4>
             <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
-              <h3>Welcome</h3>
+              <h3>Welcome {username}</h3>
               <i style={{fontSize: "15px"}}>You can update your details</i>
             </span>
           </div>
@@ -52,7 +74,7 @@ const Profile = () => {
 
             <div className='profile flex  justify-center py-4'>
               <label htmlFor='profile'>
-                <img className={`${styles.profile_img}`} src={file || assets.female7} alt='avatar'/>
+                <img className={`${styles.profile_img}`} src={apiData?.profile || file || assets.female7} alt='avatar'/>
               </label>
               
                <input onChange={onUpload} type='file' id='profile' name='profile'/>
@@ -60,16 +82,16 @@ const Profile = () => {
 
             <div className='textbox flex flex-col items-center gap-6'>
               <div className='name flex gap-10 w-3/4'> 
-                <input  {...formik.getFieldProps('firstName')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='First name'/>
-                <input  {...formik.getFieldProps('lasttName')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Last name'/>
+                <input required  {...formik.getFieldProps('firstName')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='First name'/>
+                <input required  {...formik.getFieldProps('lasttName')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Last name'/>
               </div>
               
               <div className='name flex gap-10 w-3/4'> 
-                <input  {...formik.getFieldProps('mobile')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Mobile no'/>
+                <input required {...formik.getFieldProps('mobile')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Mobile no'/>
                 <input  {...formik.getFieldProps('email')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Email address'/>
               </div>
               
-                <input  {...formik.getFieldProps('address')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Home address'/>
+                <input required  {...formik.getFieldProps('address')} className={`${styles.textbox} ${extend.textbox}`} type='text' placeholder='Home address'/>
                 <button className={styles.btn} type='submit'>Update</button>
             </div>
 
